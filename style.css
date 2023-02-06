@@ -1,0 +1,26 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.container {
+  display: grid;
+  margin: 50px auto;
+  width: max-content;
+  gap: 5px;
+  background-color: blue;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
+}
+
+.container button {
+  border: none;
+  background-color: white;
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+.container button:hover {
+  cursor: pointer;
+}
