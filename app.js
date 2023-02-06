@@ -1,6 +1,8 @@
 
 const boardContainer = document.querySelector('.container');
 const scoreBoard = document.querySelector('.score-board');
+const chooseContainer = document.querySelector('.choose');
+const chooseButtons = document.querySelectorAll('.choice');
 
 // const reset = document.querySelector('.reset');
 
@@ -52,7 +54,7 @@ const GameBoard = (() => {
 
     turns += 1;
 
-    if (turns === 9 && !result) {
+    if (turns >= 9 && !result) {
       result = 'Draw';
       resultData.textContent = `The result is a Draw`;
       scoreBoard.appendChild(resultData);
@@ -66,56 +68,136 @@ const GameBoard = (() => {
     return result;
   }
 
-  return { updateBoard, checkWinner, getResult };
+  return { updateBoard, checkWinner, getResult};
 
 })();
 
-const Player = (xo) => {
-  getXo = () => xo;
+const Player = (xO) => {
+  getXo = () => xO;
   return { getXo };
 };
+
+const randomAi = (xO) => {
+  getXo = () => xO;
+  const RandomMove = () => Math.floor(Math.random() * 9);
+  return { getXo, RandomMove };
+}
 
 const buttons = document.querySelectorAll('.btn');
 const playerX = Player('X');
 const playerO = Player('O');
+const pc = randomAi('O');
 let current = 'X';
+let aiCount = 0;
 
 // Each click will check if there's a winner and update the board
 // also it cycles between players with each click
-buttons.forEach(button => button.addEventListener('click', () => {
+const playHuman = () => {
+  buttons.forEach(button => button.addEventListener('click', () => {
 
-  if (!!button.textContent || !!GameBoard.getResult()) {
-    return;
-  }
+    if (!!button.textContent || !!GameBoard.getResult()) {
+      return;
+    }
 
-  if (current === 'X') {
+    if (current === 'X') {
+      button.textContent = playerX.getXo();
+      GameBoard.updateBoard(button.id, playerX.getXo());
+      current = 'O';
+    } else if (current === 'O') {
+      button.textContent = playerO.getXo();
+      GameBoard.updateBoard(button.id, playerO.getXo());
+      current = 'X';
+    }
+    GameBoard.checkWinner();
+  }));
+}
+
+const playAi = () => {
+  buttons.forEach(button => button.addEventListener('click', () => {
+
+    if (!!button.textContent || !!GameBoard.getResult()) {
+      return;
+    }
+
     button.textContent = playerX.getXo();
     GameBoard.updateBoard(button.id, playerX.getXo());
-    current = 'O';
-  } else if (current === 'O') {
-    button.textContent = playerO.getXo();
-    GameBoard.updateBoard(button.id, playerO.getXo());
-    current = 'X';
-  }
-  GameBoard.checkWinner();
-}));
+    
+    
+    if (aiCount < 4) {
+      while (true) {
+        let index = pc.RandomMove();
+        if (!buttons[index].textContent) {
+          buttons[index].textContent = pc.getXo();
+          GameBoard.updateBoard(buttons[index].id, pc.getXo());
+          aiCount += 1;
+          GameBoard.checkWinner();
+          break;
+        }
+      }
+   }
+    
+   
+    // let index = pc.RandomMove();
+    // console.log(index);
+    // while (!buttons[index].textContent) {
+    //   buttons[index].textContent = pc.getxO();
+    //   console.log(index);
+    //   break
+    // }    
+
+    GameBoard.checkWinner();
+  }));
+}
 
 
-// reset.addEventListener('click', () => {
-//   GameBoard.updateBoard();
-// })
 
-// const playGame = (xo, house) => {
+chooseButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.className.includes('player')) {
 
-// };
+      playHuman();
 
-// const player = (xo, house) => {
+    } else if (btn.className.includes('ai')) {
 
-//   const play = (xo, house) => {
-//     gameBoard.board[house] = xo;
-//   };
-//   return { xo, play, house }
-// };
+      playAi();
 
-// const zack = player('X', 0);
+    }
+    chooseContainer.classList.add('display');
+  })
+})
 
+
+// const playAi = () => {
+
+  //   if (current === 'X') {
+  
+  //     buttons.forEach(button => button.addEventListener('click', () => {
+  
+  //       if (!!button.textContent || !!GameBoard.getResult()) {
+  //         return;
+  //       }
+  
+  //       button.textContent = playerX.getXo();
+  //       GameBoard.updateBoard(button.id, playerX.getXo());
+  //       current = 'O';
+  //       console.log(current);
+  //       let ai = GameBoard.AI();
+  //       while (!!buttons[ai]) {
+  //         buttons[ai].textContent = playerO.getXo();
+  //         GameBoard.updateBoard(ai, playerO.getXo());
+  //       }
+  //       current = 'X';
+  //       return;
+  //     }))
+  //   } else if (current === 'O') {
+  //     console.log(current + 'ai');
+  //     let ai = GameBoard.AI();
+  //     while (buttons[ai].textContent === '') {
+  //       buttons[ai].textContent = playerO.getXo();
+  //       GameBoard.updateBoard(ai, playerO.getXo());
+  //     }
+  //     current = 'X';
+  //   }
+  
+  //   GameBoard.checkWinner();
+  // }

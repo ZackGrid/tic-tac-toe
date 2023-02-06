@@ -24,3 +24,7 @@
 .container button:hover {
   cursor: pointer;
 }
+
+.display {
+  display: none;
+}
