@@ -155,10 +155,12 @@ chooseButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     if (btn.className.includes('player')) {
 
+      boardContainer.classList.remove('display');
       playHuman();
 
     } else if (btn.className.includes('ai')) {
 
+      boardContainer.classList.remove('display');
       playAi();
 
     }
@@ -166,6 +168,22 @@ chooseButtons.forEach(btn => {
   })
 })
 
+// -----------------------------------------------------
+
+function bestMove() {
+  let bestScore = -Infinity;
+  forEach(position => {
+    if (position.textContent === '') {
+      let score = minimax(board);
+      if (score > bestScore) {
+        bestScore = score;
+        optimalMove = position;
+      }
+    }
+  })
+}
+
+// -----------------------------------------------------
 
 // const playAi = () => {
 
