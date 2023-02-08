@@ -4,6 +4,8 @@ const scoreBoard = document.querySelector('.score-board');
 const chooseContainer = document.querySelector('.choose');
 const chooseButtons = document.querySelectorAll('.choice');
 const parent = document.querySelector('.parent-container');
+const footerBtns = document.querySelector('.footer-buttons');
+const footerBtnsList = document.querySelectorAll('.footer');
 
 // const reset = document.querySelector('.reset');
 
@@ -29,12 +31,18 @@ const GameBoard = (() => {
     i += 1;
   })
 
+  const resetBoard = () => {
+    board.forEach(house => {
+      house = '';
+    });
+  }
+
   const updateBoard = (house, xO) => {
     board[house] = xO;
   }
 
   const resultData = document.createElement('div');
-  let turns = 0;
+  resultData.classList.add('result-data');
   let result = '';
 
   const checkWinner = () => {
@@ -53,7 +61,13 @@ const GameBoard = (() => {
     check(board[0], board[4], board[8]);
     check(board[2], board[4], board[6]);
 
-    turns += 1;
+    let turns = 0;
+
+    board.forEach(house => {
+      if (house != '') {
+        turns += 1;
+      }
+    })
 
     if (turns >= 9 && !result) {
       result = 'Draw';
@@ -69,7 +83,7 @@ const GameBoard = (() => {
     return result;
   }
 
-  return { updateBoard, checkWinner, getResult};
+  return { updateBoard, checkWinner, getResult, resetBoard};
 
 })();
 
@@ -125,6 +139,10 @@ const playAi = () => {
     
     
     if (aiCount < 4) {
+      GameBoard.checkWinner();
+      if (GameBoard.getResult() != '') {
+        return;
+      }
       while (true) {
         let index = pc.RandomMove();
         if (!buttons[index].textContent) {
@@ -139,18 +157,10 @@ const playAi = () => {
           break;
         }
       }
-   }
+    }
     
-   
-    // let index = pc.RandomMove();
-    // console.log(index);
-    // while (!buttons[index].textContent) {
-    //   buttons[index].textContent = pc.getxO();
-    //   console.log(index);
-    //   break
-    // }    
-
     GameBoard.checkWinner();
+    
   }));
 }
 
@@ -158,31 +168,53 @@ chooseButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     if (btn.className.includes('player')) {
 
-      boardContainer.classList.remove('display');
       parent.classList.remove('display');
+      footerBtns.classList.remove('display');
+      
       setTimeout(() => {
-        boardContainer.classList.remove('visually-hidden');
         parent.classList.remove('visually-hidden');
+        footerBtns.classList.remove('visually-hidden');
       }, 10);
       
       playHuman();
       
-
     } else if (btn.className.includes('ai')) {
       
-      boardContainer.classList.remove('display');
       parent.classList.remove('display');
+      footerBtns.classList.remove('display');
+      
       setTimeout(() => {
-        boardContainer.classList.remove('visually-hidden');
         parent.classList.remove('visually-hidden');
+        footerBtns.classList.remove('visually-hidden');
       }, 10);
+
       playAi();
 
     }
+
     chooseContainer.classList.add('display');
+    
   })
 })
 
+footerBtnsList.forEach(btn => btn.addEventListener('click', () => {
+
+  if (btn.className.includes('choose-mode')) {
+    location.reload();
+  }
+
+  if (btn.className.includes('reset-game')) {
+    if (GameBoard.getResult() === '') {
+      GameBoard.resetBoard();
+      buttons.forEach(btn => btn.textContent = '');
+    }
+  }
+
+  if (btn.className.includes('rematch')) {
+    location.reload();
+  }
+
+}))
 
 // chooseButtons.forEach(btn => {
 //   btn.addEventListener('click', () => {
