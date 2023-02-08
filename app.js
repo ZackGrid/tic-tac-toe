@@ -7,6 +7,7 @@ const parent = document.querySelector('.parent-container');
 const footerBtns = document.querySelector('.footer-buttons');
 const footerBtnsList = document.querySelectorAll('.footer');
 const scoreBoardContent = document.querySelectorAll('.li');
+const scoreBoardTurn = document.querySelector('.turn');
 
 // const reset = document.querySelector('.reset');
 
@@ -91,7 +92,7 @@ const GameBoard = (() => {
     result = '';
     turns = 0;
     aiCount = 0;
-    console.log({result, turns, aiCount});
+    scoreBoardTurn.textContent = 'X';
   }
   const updateAiCount = () => {
     aiCount += 1;
@@ -142,6 +143,12 @@ let current = 'X';
 // also it cycles between players with each click
 const playHuman = () => {
   buttons.forEach(button => button.addEventListener('click', () => {
+
+    if (scoreBoardTurn.textContent === 'O') {
+      scoreBoardTurn.textContent = 'X';
+    } else if(scoreBoardTurn.textContent === 'X') {
+      scoreBoardTurn.textContent = 'O';
+    }
 
     if (!!button.textContent || !!GameBoard.getResult()) {
       return;
@@ -199,8 +206,9 @@ const playAi = () => {
 
 chooseButtons.forEach(btn => {
   btn.addEventListener('click', () => {
+    scoreBoardTurn.textContent = 'X';
     if (btn.className.includes('player')) {
-
+      
       parent.classList.remove('display');
       footerBtns.classList.remove('display');
       
