@@ -6,6 +6,7 @@ const chooseButtons = document.querySelectorAll('.choice');
 const parent = document.querySelector('.parent-container');
 const footerBtns = document.querySelector('.footer-buttons');
 const footerBtnsList = document.querySelectorAll('.footer');
+const scoreBoardContent = document.querySelectorAll('.li');
 
 // const reset = document.querySelector('.reset');
 
@@ -31,25 +32,21 @@ const GameBoard = (() => {
     i += 1;
   })
 
-  const resetBoard = () => {
-    board.forEach(house => {
-      house = '';
-    });
-  }
-
-  const updateBoard = (house, xO) => {
-    board[house] = xO;
-  }
-
   const resultData = document.createElement('div');
   resultData.classList.add('result-data');
+  let x = 0;
+  let o = 0;
   let result = '';
+  let aiCount = 0;
 
   const checkWinner = () => {
 
     function check(n1, n2, n3) {
       if (!n1) return;
-      if (n1 === n2 && n2 === n3) result = n1;
+      if (n1 === n2 && n2 === n3) {
+        result = n1;
+      }    
+      
     }
 
     check(board[0], board[1], board[2]);
@@ -79,11 +76,48 @@ const GameBoard = (() => {
     }
   };
 
-  function getResult() {
+  const checkWhoWon = () => {
+    if (result === 'X') {
+      x += 1;
+    } else if (result === 'O') {
+      o += 1;
+    }
+  }
+
+  const resetBoard = () => {
+    for (let i = 0; i < board.length; i++ ) {
+      board[i] = '';
+    }
+    result = '';
+    turns = 0;
+    aiCount = 0;
+    console.log({result, turns, aiCount});
+  }
+  const updateAiCount = () => {
+    aiCount += 1;
+  }
+
+  const getAiCount = () => {
+    return aiCount;
+  } 
+
+  const updateBoard = (house, xO) => {
+    board[house] = xO;
+  }
+
+  const getResult = () => {
     return result;
   }
 
-  return { updateBoard, checkWinner, getResult, resetBoard};
+  const getXwins = () => {
+    return x.toString();
+  }
+
+  const getOwins = () => {
+    return o.toString();
+  }
+
+  return { updateBoard, checkWinner, getResult, resetBoard, getXwins, getOwins, getAiCount, updateAiCount, checkWhoWon, board};
 
 })();
 
@@ -103,7 +137,6 @@ const playerX = Player('X');
 const playerO = Player('O');
 const pc = randomAi('O');
 let current = 'X';
-let aiCount = 0;
 
 // Each click will check if there's a winner and update the board
 // also it cycles between players with each click
@@ -138,7 +171,7 @@ const playAi = () => {
     GameBoard.updateBoard(button.id, playerX.getXo());
     
     
-    if (aiCount < 4) {
+    if (GameBoard.getAiCount() < 4) {
       GameBoard.checkWinner();
       if (GameBoard.getResult() != '') {
         return;
@@ -152,7 +185,7 @@ const playAi = () => {
           }, 200)
           
           GameBoard.updateBoard(buttons[index].id, pc.getXo());
-          aiCount += 1;
+          GameBoard.updateAiCount();
           GameBoard.checkWinner();
           break;
         }
@@ -200,18 +233,32 @@ chooseButtons.forEach(btn => {
 footerBtnsList.forEach(btn => btn.addEventListener('click', () => {
 
   if (btn.className.includes('choose-mode')) {
+
     location.reload();
   }
 
   if (btn.className.includes('reset-game')) {
     if (GameBoard.getResult() === '') {
+
       GameBoard.resetBoard();
       buttons.forEach(btn => btn.textContent = '');
     }
   }
 
   if (btn.className.includes('rematch')) {
-    location.reload();
+    
+    GameBoard.checkWhoWon();
+    GameBoard.resetBoard();
+    buttons.forEach(btn => btn.textContent = '');
+    scoreBoardContent.forEach(li => {
+      if (li.className.includes('x-vic')) {
+
+        li.textContent = GameBoard.getXwins();
+      } else if (li.className.includes('o-vic')) {
+        
+        li.textContent = GameBoard.getOwins();
+      }
+    })
   }
 
 }))
