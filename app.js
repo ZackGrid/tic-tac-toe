@@ -3,6 +3,7 @@ const boardContainer = document.querySelector('.container');
 const scoreBoard = document.querySelector('.score-board');
 const chooseContainer = document.querySelector('.choose');
 const chooseButtons = document.querySelectorAll('.choice');
+const parent = document.querySelector('.parent-container');
 
 // const reset = document.querySelector('.reset');
 
@@ -118,7 +119,7 @@ const playAi = () => {
     if (!!button.textContent || !!GameBoard.getResult()) {
       return;
     }
-
+    
     button.textContent = playerX.getXo();
     GameBoard.updateBoard(button.id, playerX.getXo());
     
@@ -127,7 +128,11 @@ const playAi = () => {
       while (true) {
         let index = pc.RandomMove();
         if (!buttons[index].textContent) {
-          buttons[index].textContent = pc.getXo();
+          
+          setTimeout(() => {
+            buttons[index].textContent = pc.getXo();
+          }, 200)
+          
           GameBoard.updateBoard(buttons[index].id, pc.getXo());
           aiCount += 1;
           GameBoard.checkWinner();
@@ -149,24 +154,54 @@ const playAi = () => {
   }));
 }
 
-
-
 chooseButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     if (btn.className.includes('player')) {
 
       boardContainer.classList.remove('display');
+      parent.classList.remove('display');
+      setTimeout(() => {
+        boardContainer.classList.remove('visually-hidden');
+        parent.classList.remove('visually-hidden');
+      }, 10);
+      
       playHuman();
+      
 
     } else if (btn.className.includes('ai')) {
-
+      
       boardContainer.classList.remove('display');
+      parent.classList.remove('display');
+      setTimeout(() => {
+        boardContainer.classList.remove('visually-hidden');
+        parent.classList.remove('visually-hidden');
+      }, 10);
       playAi();
 
     }
     chooseContainer.classList.add('display');
   })
 })
+
+
+// chooseButtons.forEach(btn => {
+//   btn.addEventListener('click', () => {
+//     if (btn.className.includes('player')) {
+
+//       boardContainer.classList.remove('display');
+//       parent.classList.remove('display');
+//       playHuman();
+
+//     } else if (btn.className.includes('ai')) {
+      
+//       boardContainer.classList.remove('display');
+//       parent.classList.remove('display');
+//       playAi();
+
+//     }
+//     chooseContainer.classList.add('display');
+//   })
+// })
 
 // -----------------------------------------------------
 

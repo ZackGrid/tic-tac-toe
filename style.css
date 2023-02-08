@@ -10,6 +10,8 @@
   --grey-dark: rgb(51, 47, 56);
   --grey-light: rgb(190, 185, 196);
   --white: rgb(234, 238, 243);
+
+  --gradient: linear-gradient(45deg, rgb(255, 215, 38), rgb(241, 83, 170), rgb(117, 79, 255));
 }
 
 @font-face {
@@ -42,19 +44,36 @@ h1 {
   margin: auto;
 }
 
+.parent-container {
+  padding: 20px;
+  border-radius: 10px;
+  width: clamp(600px, 80%, 800px);
+  margin: 100px auto;
+  background-color: var(--grey-light);
+  box-shadow: 0px 5px 5px var(--grey-dark);
+
+}
+
+.parent-container {
+  transition: all 2s ease;
+}
+
 .container {
   display: grid;
-  margin: 50px auto;
+  margin: auto;
+  padding: 10px;
+  border-radius: 10px;
   width: max-content;
   gap: 5px;
-  background-color: blue;
+  background-color: var(--secondary);
   grid-template-columns: repeat(3, 100px);
   grid-template-rows: repeat(3, 100px);
+  box-shadow: 0px 0px 10px 0px var(--grey-dark);
 }
 
 .choose {
   display: grid;
-  /* border: 1px solid var(--grey-light); */
+  border: 1px solid var(--grey-light);
   background-color: white;
   border-radius: 10px;
   padding: 25px;
@@ -73,19 +92,30 @@ h1 {
   border: none;
   border-radius: 10px;
   color: var(--grey-dark);
-  background-color: var(--main);
+  background-image: var(--gradient);
+  background-size: 300%;
+  background-position: left;
+  transition: background-position 2s;
+  /* background-color: var(--main); */
 }
 
 .choice:hover {
   box-shadow: -5px 5px var(--grey-dark);
-  transition-duration: 0.5s;
+  background-position: right;
+  transition-duration: 2s;
 }
+
+/* .choice:active {
+  background-image: none;
+  border: 3px solid var(--grey-dark);
+} */
 
 .container button {
   border: none;
-  background-color: white;
-  font-size: 3rem;
+  background-color: var(--white);
+  font-size: 4rem;
   font-weight: bold;
+  text-align: center;
 }
 
 .container button:hover {
@@ -94,4 +124,8 @@ h1 {
 
 .display {
   display: none;
+}
+
+.visually-hidden {
+  opacity: 0;
 }
