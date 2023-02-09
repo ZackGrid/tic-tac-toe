@@ -98,7 +98,9 @@ const GameBoard = (() => {
     turns = 0;
     aiCount = 0;
     scoreBoardTurn.textContent = 'X';
-    scoreBoard.removeChild(resultData);
+    if (resultData.hasChildNodes()) {
+      resultData.textContent = '';
+    }
   }
 
   // This is used to increase every time the AI makes a move
