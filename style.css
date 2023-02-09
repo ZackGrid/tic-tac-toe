@@ -144,6 +144,7 @@ h1 {
   box-shadow: -5px 5px var(--grey-dark);
   color: white;
   animation: gradient 5s infinite alternate;
+  transition: all 0.5s;
   cursor: pointer;
 }
 
