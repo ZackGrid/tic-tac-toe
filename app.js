@@ -93,6 +93,7 @@ const GameBoard = (() => {
     for (let i = 0; i < board.length; i++) {
       board[i] = '';
     }
+    current = 'X';
     result = '';
     turns = 0;
     aiCount = 0;
