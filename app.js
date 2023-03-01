@@ -14,23 +14,27 @@ const GameBoard = (() => {
 
   // array for the board
   const board = [
-    '', '', '',
-    '', '', '',
-    '', '', ''
+    ['', '', ''],
+    ['', '', ''],
+    ['', '', '']
   ];
 
 
   // Create and populate the board
   // using the array above as the base
-  let i = 0;
-  board.forEach(element => {
-    const btn = document.createElement('button');
-    btn.id = `${i}`;
-    btn.className = 'btn';
-    btn.textContent = element;
-    boardContainer.appendChild(btn);
-    i += 1;
-  })
+
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      const btn = document.createElement('button');
+      btn.id = `${i}${j}`;
+      btn.className = 'btn';
+      btn.textContent = '';
+      boardContainer.appendChild(btn);
+
+    }
+  }
+
+
 
   // Create variables to be used in the module
   const resultData = document.createElement('div');
@@ -38,42 +42,63 @@ const GameBoard = (() => {
   let x = 0;
   let o = 0;
   let result = '';
+  let value = '';
   let aiCount = 0;
+
+  const check = (n1, n2, n3) => {
+    if (n1 === '') return;
+    if (n1 === n2 && n2 === n3) {
+      value = n1;
+    }
+  }
+
+  const checkResult = () => {
+    value = '';
+    // Check all possible win scenarios
+    check(board[0][0], board[0][1], board[0][2]);
+    check(board[1][0], board[1][1], board[1][2]);
+    check(board[2][0], board[2][1], board[2][2]);
+    check(board[0][0], board[1][0], board[2][0]);
+    check(board[0][1], board[1][1], board[2][1]);
+    check(board[0][2], board[1][2], board[2][2]);
+    check(board[0][0], board[1][1], board[2][2]);
+    check(board[0][2], board[1][1], board[2][0]);
+    if (value === 'X') {
+      return -10;
+    } else if (value === 'O') {
+      return 10;
+    }
+  }
 
   const checkWinner = () => {
 
-    function check(n1, n2, n3) {
-      if (!n1) return;
-      if (n1 === n2 && n2 === n3) {
-        result = n1;
-      }
+    value = '';
 
+    checkResult();
+
+    if (value != '') {
+      result = value;
     }
-
-    // Check all possible win scenarios
-    check(board[0], board[1], board[2]);
-    check(board[3], board[4], board[5]);
-    check(board[6], board[7], board[8]);
-    check(board[0], board[3], board[6]);
-    check(board[1], board[4], board[7]);
-    check(board[2], board[5], board[8]);
-    check(board[0], board[4], board[8]);
-    check(board[2], board[4], board[6]);
 
     // Holds the amount of turns passed
     let turns = 0;
-    board.forEach(house => {
-      if (house != '') {
-        turns += 1;
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (board[i][j] !== '') {
+          turns += 1;
+        }
       }
-    })
+    }
 
     // Decide the result and shows on screen
     if (turns >= 9 && !result) {
+
       result = 'Draw';
       resultData.textContent = `The result is a Draw`;
       scoreBoard.appendChild(resultData);
-    } else if (result) {
+
+    } else if (result !== '') {
+
       resultData.textContent = `The Winner is ${result}`;
       scoreBoard.appendChild(resultData);
     }
@@ -90,8 +115,10 @@ const GameBoard = (() => {
 
   // Reset the game and all values
   const resetBoard = () => {
-    for (let i = 0; i < board.length; i++) {
-      board[i] = '';
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        board[i][j] = '';
+      }
     }
     current = 'X';
     result = '';
@@ -114,8 +141,8 @@ const GameBoard = (() => {
   }
 
   // Update the array with the current move
-  const updateBoard = (house, xO) => {
-    board[house] = xO;
+  const updateBoard = (array, xO) => {
+    board[array[0]][array[1]] = xO;
   }
 
   // Return the result of the game
@@ -133,7 +160,7 @@ const GameBoard = (() => {
     return o.toString();
   }
 
-  return { updateBoard, checkWinner, getResult, resetBoard, getXwins, getOwins, getAiCount, updateAiCount, checkWhoWon };
+  return { updateBoard, checkWinner, getResult, resetBoard, getXwins, getOwins, getAiCount, updateAiCount, checkWhoWon, checkResult, board };
 
 })();
 
@@ -187,56 +214,14 @@ const playHuman = () => {
     // Check whos turn is to play
     if (current === 'X') {
       button.textContent = playerX.getXo();
-      GameBoard.updateBoard(button.id, playerX.getXo());
+      GameBoard.updateBoard(button.id.split(''), playerX.getXo());
       current = 'O';
     } else if (current === 'O') {
       button.textContent = playerO.getXo();
-      GameBoard.updateBoard(button.id, playerO.getXo());
+      GameBoard.updateBoard(button.id.split(''), playerO.getXo());
       current = 'X';
     }
     GameBoard.checkWinner();
-  }));
-}
-
-// Human vs AI. Waits for human to play, then call AI
-const playAi = () => {
-  buttons.forEach(button => button.addEventListener('click', () => {
-
-    // Check if game has ended
-    if (!!button.textContent || !!GameBoard.getResult()) {
-      return;
-    }
-
-    button.textContent = playerX.getXo();
-    GameBoard.updateBoard(button.id, playerX.getXo());
-
-    // Checks if AI can still play
-    if (GameBoard.getAiCount() < 4) {
-      GameBoard.checkWinner();
-      if (GameBoard.getResult() != '') {
-        return;
-      }
-      // Choose a random empty space to play
-      while (true) {
-        let index = pc.RandomMove();
-        if (!buttons[index].textContent) {
-
-          // delay the AI so it's not instantaneous right
-          // after human played
-          setTimeout(() => {
-            buttons[index].textContent = pc.getXo();
-          }, 200)
-
-          GameBoard.updateBoard(buttons[index].id, pc.getXo());
-          GameBoard.updateAiCount();
-          GameBoard.checkWinner();
-          break;
-        }
-      }
-    }
-
-    GameBoard.checkWinner();
-
   }));
 }
 
@@ -316,19 +301,168 @@ footerBtnsList.forEach(btn => btn.addEventListener('click', () => {
 
 }))
 
+
+const playAi = () => {
+  buttons.forEach(button => button.addEventListener('click', () => {
+
+    // Check if game has ended
+    if (!!button.textContent || !!GameBoard.getResult()) {
+      return;
+    }
+
+    button.textContent = playerX.getXo();
+    GameBoard.updateBoard(button.id.split(''), playerX.getXo());
+
+
+
+    // Checks if AI can still play
+    if (GameBoard.getAiCount() < 4) {
+
+      GameBoard.checkWinner();
+
+      if (GameBoard.getResult() !== '') {
+        return;
+      }
+
+      let index = findBestMove(GameBoard.board)
+
+      let indexConcat = index.i.toString() + index.j;
+      //console.log(indexConcat);
+
+
+      setTimeout(() => {
+        buttons.forEach(btn => {
+          if (btn.id === indexConcat) {
+            btn.textContent = pc.getXo();
+          }
+        })
+        // buttons[indexConcat].textContent = pc.getXo();
+      }, 200)
+
+      GameBoard.updateBoard(Object.values(index), pc.getXo());
+      GameBoard.updateAiCount();
+
+      GameBoard.checkWinner();
+    }
+    GameBoard.checkWinner();
+  }));
+}
+
+// AI - minimax
 // -----------------------------------------------------
 
-function bestMove() {
-  let bestScore = -Infinity;
-  forEach(position => {
-    if (position.textContent === '') {
-      let score = minimax(board);
-      if (score > bestScore) {
-        bestScore = score;
-        optimalMove = position;
+
+function findBestMove(board) {
+
+  let bestMove = {};
+  let bestVal = -Infinity;
+
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+
+      if (board[i][j] === '') {
+
+        board[i][j] = 'O';
+
+        let moveVal = minimax(board, 0, false);
+
+        board[i][j] = '';
+
+        if (moveVal > bestVal) {
+
+          bestVal = moveVal;
+          bestMove = { i, j };
+
+        }
       }
     }
-  })
+  }
+
+  return bestMove;
+}
+
+function minimax(board, depth, maxPlayer) {
+
+  let score = GameBoard.checkResult();
+
+  if (!!score) {
+
+    if (score < 0) {
+
+      return score + depth;
+
+    } else {
+
+      return score - depth;
+
+    }
+
+  }
+  if (!isMovesLeft(board)) {
+
+    return 0;
+
+  }
+
+  if (maxPlayer) {
+
+    let maxEval = -Infinity;
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+
+        if (board[i][j] === '') {
+
+          board[i][j] = 'O';
+
+          let eval = minimax(board, depth + 1, false);
+
+          board[i][j] = '';
+
+          maxEval = Math.max(maxEval, eval);
+
+        }
+      }
+    }
+
+    return maxEval;
+
+  } else {
+
+    let minEval = Infinity;
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+
+        if (board[i][j] === '') {
+
+          board[i][j] = 'X';
+
+          let eval = minimax(board, depth + 1, true);
+
+          board[i][j] = '';
+
+          minEval = Math.min(minEval, eval);
+
+        }
+      }
+    }
+    return minEval;
+
+  }
+}
+
+function isMovesLeft(board) {
+
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+
+      if (board[i][j] === '') {
+        return true;
+
+      }
+    }
+  }
+
+  return false;
 }
 
 // -----------------------------------------------------
