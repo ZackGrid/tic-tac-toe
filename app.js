@@ -124,6 +124,7 @@ const GameBoard = (() => {
     result = '';
     turns = 0;
     aiCount = 0;
+    moves = 0;
     scoreBoardTurn.textContent = 'X';
     if (resultData.hasChildNodes()) {
       resultData.textContent = '';
@@ -173,7 +174,7 @@ const Player = (xO) => {
 // Factory function to create AI obj
 const randomAi = (xO) => {
   getXo = () => xO;
-  const RandomMove = () => Math.floor(Math.random() * 9);
+  const RandomMove = () => Math.floor(Math.random() * 3);
   return { getXo, RandomMove };
 }
 
@@ -352,6 +353,8 @@ const playAi = () => {
 // AI - minimax
 // -----------------------------------------------------
 
+// so to make random decisions occasionally
+let moves = 0;
 
 function findBestMove(board) {
 
@@ -379,6 +382,21 @@ function findBestMove(board) {
     }
   }
 
+  // Logic to make random decisions and therefore mistakes
+  moves++;
+
+  if (moves === pc.RandomMove() + 1) {
+    while (true) {
+      let indexI = pc.RandomMove();
+      let indexJ = pc.RandomMove();
+      if (board[indexI][indexJ] === '') {
+        bestMove.i = indexI;
+        bestMove.j = indexJ;
+        break;
+      }
+    }
+  }
+
   return bestMove;
 }
 
@@ -389,12 +407,6 @@ function minimax(board, depth, maxPlayer) {
   if (!!score) {
 
     return score;
-
-  }
-
-  if (depth > 3) {
-
-    return 0;
 
   }
 
