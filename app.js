@@ -385,7 +385,7 @@ function findBestMove(board) {
   // Logic to make random decisions and therefore mistakes
   moves++;
 
-  if (moves === pc.RandomMove() + 1) {
+  if (moves === pc.RandomMove() + 2) {
     while (true) {
       let indexI = pc.RandomMove();
       let indexJ = pc.RandomMove();
