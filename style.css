@@ -220,7 +220,7 @@ h1 {
     margin: auto;
     grid-template-rows: repeat(2, 1fr);
     grid-template-columns: none;
-    width: fit-content;
+    width: max-content;
   }
 
   .container {

@@ -387,17 +387,16 @@ function minimax(board, depth, maxPlayer) {
 
   if (!!score) {
 
-    if (score < 0) {
-
-      return score + depth;
-
-    } else {
-
-      return score - depth;
-
-    }
+    return score;
 
   }
+
+  if (depth > 3) {
+
+    return 0;
+
+  }
+
   if (!isMovesLeft(board)) {
 
     return 0;
