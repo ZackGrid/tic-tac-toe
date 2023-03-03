@@ -225,8 +225,8 @@ h1 {
   }
 
   .container {
-    grid-template-columns: repeat(3, 80px);
-    grid-template-rows: repeat(3, 80px);
+    grid-template-columns: repeat(3, 70px);
+    grid-template-rows: repeat(3, 70px);
   }
 
   .container button {
@@ -238,6 +238,8 @@ h1 {
     margin: 40px auto;
     gap: 20px;
     width: 70%;
+
+    transition: none;
   }
 
 }
