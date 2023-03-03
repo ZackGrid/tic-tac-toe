@@ -257,7 +257,8 @@ chooseButtons.forEach(btn => {
 
     }
 
-    chooseContainer.classList.add('display');
+    // chooseContainer.classList.add('display');
+    chooseContainer.remove();
 
   })
 })
