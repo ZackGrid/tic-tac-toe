@@ -46,13 +46,16 @@ const GameBoard = (() => {
   let aiCount = 0;
 
   const check = (n1, n2, n3) => {
+
     if (n1 === '') return;
     if (n1 === n2 && n2 === n3) {
       value = n1;
     }
+
   }
 
   const checkResult = () => {
+
     value = '';
     // Check all possible win scenarios
     check(board[0][0], board[0][1], board[0][2]);
@@ -171,7 +174,7 @@ const Player = (xO) => {
   return { getXo };
 };
 
-// Factory function to create AI obj
+// Factory function to create AI obj for random play
 const randomAi = (xO) => {
   getXo = () => xO;
   const RandomMove = () => Math.floor(Math.random() * 3);
@@ -221,6 +224,54 @@ const playHuman = () => {
       button.textContent = playerO.getXo();
       GameBoard.updateBoard(button.id.split(''), playerO.getXo());
       current = 'X';
+    }
+    GameBoard.checkWinner();
+  }));
+}
+
+// AI will wait for human to play, and then activate minimax to 
+// choose it's move.
+const playAi = () => {
+  buttons.forEach(button => button.addEventListener('click', () => {
+
+    // Check if game has ended
+    if (!!button.textContent || !!GameBoard.getResult()) {
+      return;
+    }
+
+    button.textContent = playerX.getXo();
+    GameBoard.updateBoard(button.id.split(''), playerX.getXo());
+
+
+
+    // Checks if AI can still play
+    if (GameBoard.getAiCount() < 4) {
+
+      GameBoard.checkWinner();
+
+      if (GameBoard.getResult() !== '') {
+        return;
+      }
+
+      let index = findBestMove(GameBoard.board)
+
+      let indexConcat = index.i.toString() + index.j;
+      //console.log(indexConcat);
+
+
+      setTimeout(() => {
+        buttons.forEach(btn => {
+          if (btn.id === indexConcat) {
+            btn.textContent = pc.getXo();
+          }
+        })
+        // buttons[indexConcat].textContent = pc.getXo();
+      }, 200)
+
+      GameBoard.updateBoard(Object.values(index), pc.getXo());
+      GameBoard.updateAiCount();
+
+      GameBoard.checkWinner();
     }
     GameBoard.checkWinner();
   }));
@@ -303,59 +354,14 @@ footerBtnsList.forEach(btn => btn.addEventListener('click', () => {
 
 }))
 
-
-const playAi = () => {
-  buttons.forEach(button => button.addEventListener('click', () => {
-
-    // Check if game has ended
-    if (!!button.textContent || !!GameBoard.getResult()) {
-      return;
-    }
-
-    button.textContent = playerX.getXo();
-    GameBoard.updateBoard(button.id.split(''), playerX.getXo());
-
-
-
-    // Checks if AI can still play
-    if (GameBoard.getAiCount() < 4) {
-
-      GameBoard.checkWinner();
-
-      if (GameBoard.getResult() !== '') {
-        return;
-      }
-
-      let index = findBestMove(GameBoard.board)
-
-      let indexConcat = index.i.toString() + index.j;
-      //console.log(indexConcat);
-
-
-      setTimeout(() => {
-        buttons.forEach(btn => {
-          if (btn.id === indexConcat) {
-            btn.textContent = pc.getXo();
-          }
-        })
-        // buttons[indexConcat].textContent = pc.getXo();
-      }, 200)
-
-      GameBoard.updateBoard(Object.values(index), pc.getXo());
-      GameBoard.updateAiCount();
-
-      GameBoard.checkWinner();
-    }
-    GameBoard.checkWinner();
-  }));
-}
-
 // AI - minimax
 // -----------------------------------------------------
 
-// so to make random decisions occasionally
+// So to make random decisions occasionally
 let moves = 0;
 
+// Uses minimax algorithm to decide best move and return 
+// to playAI() 
 function findBestMove(board) {
 
   let bestMove = {};
@@ -383,6 +389,7 @@ function findBestMove(board) {
   }
 
   // Logic to make random decisions and therefore mistakes
+  // occasionally, using the random AI.
   moves++;
 
   if (moves === pc.RandomMove() + 2) {
@@ -400,6 +407,8 @@ function findBestMove(board) {
   return bestMove;
 }
 
+// AI minimax function that looks into all possible moves beforehand
+// and returns a value accordingly. 
 function minimax(board, depth, maxPlayer) {
 
   let score = GameBoard.checkResult();
@@ -462,6 +471,8 @@ function minimax(board, depth, maxPlayer) {
   }
 }
 
+// This will see if there are moves left on the board, 
+// in case of a tie.
 function isMovesLeft(board) {
 
   for (let i = 0; i < 3; i++) {
